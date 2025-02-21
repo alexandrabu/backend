@@ -1,6 +1,6 @@
+
 const { Sequelize } = require('sequelize');
 require('dotenv').config();
-
 
 const requiredEnvVars = ["DB_NAME", "DB_USER", "DB_PASSWORD", "DB_HOST", "DB_PORT"];
 requiredEnvVars.forEach((key) => {
@@ -37,4 +37,14 @@ const connectDB = async () => {
   }
 };
 
-module.exports = { sequelize, connectDB };
+// Function to close the database connection (Useful for Jest testing)
+const closeDB = async () => {
+  try {
+    await sequelize.close();
+    console.log('Database connection closed.');
+  } catch (error) {
+    console.error('Error closing database connection:', error.message);
+  }
+};
+
+module.exports = { sequelize, connectDB, closeDB };
