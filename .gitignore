@@ -3,3 +3,26 @@
 .env.development
 .env.production
 node_modules
+
+# Ignore all files in the config directory
+config/
+
+# Ignore test outputs
+test-output/
+coverage/
+.nyc_output/
+reports/
+
+# Ignore temporary files
+*.log
+*.tmp
+*.bak
+*.swp
+*.swo
+.DS_Store
+Thumbs.db
+
+# Node modules and dependencies (if applicable)
+node_modules/
+dist/
+build/
