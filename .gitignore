@@ -1,8 +1,46 @@
-node_modules
+# Node.js dependencies
+node_modules/
+coverage/
+
+# Test and temporary files
+__mocks__/
+*.test.js
+*.log
+*.tmp
+
+# Compiled files and binaries
+*.out
+*.lock
+*.swp
+*.cache
+.DS_Store
+
+# OS and Editor specific
+.vscode/
+.idea/
+*.iml
+
+# Environment and Config
 .env
-.env.local
-.env.development
-.env.production
+.env.*
+config/*.json
+config/*.local.js
 
+# Database
+*.sqlite
+*.db
 
+# Logs and Reports
+logs/
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
 
+# Jest and Coverage Reports
+coverage/
+.jest/
+.nyc_output/
+
+# Swagger generated files
+swagger.json
+swagger.yaml
