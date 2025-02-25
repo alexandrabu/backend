@@ -78,18 +78,24 @@ router.get('/:id', async (req, res) => {
  *         description: User created successfully
  */
 router.post('/', async (req, res) => {
+    const { name, email, department_id } = req.body;
+
+    // Check for required fields
+    if (!name || !email || !department_id) {
+        return res.status(400).json({ error: 'Missing required fields' });
+    }
+
     try {
-        const { name, email, department_id } = req.body;
-
-        // Ensure required fields are present
-        if (!name || !email || !department_id) {
-            return res.status(400).json({ error: 'Missing required fields' });
-        }
-
-        //  Check if Department is defined
+        // Check if Department exists
         const department = await Department.findByPk(department_id);
         if (!department) {
             return res.status(400).json({ error: 'Invalid department_id' });
+        }
+
+        // Check if Email is unique
+        const existingUser = await User.findOne({ where: { email } });
+        if (existingUser) {
+            return res.status(400).json({ error: 'Email already exists' });
         }
 
         // Create the user
@@ -99,7 +105,7 @@ router.post('/', async (req, res) => {
         return res.status(201).json({ message: 'User created successfully', user });
 
     } catch (error) {
-        console.error(' Error creating user:', error);  // Log exact error
+        console.error('Error creating user:', error);  // Log exact error
         return res.status(500).json({ error: 'Internal Server Error', details: error.message });
     }
 });
@@ -139,13 +145,19 @@ router.post('/', async (req, res) => {
 router.put('/:id', async (req, res) => {
     try {
         const user = await User.findByPk(req.params.id);
-        if (!user) return res.status(404).json({ error: 'User not found' });
+        if (!user) {
+            return res.status(404).json({ error: 'User not found' });
+        }
+
         await user.update(req.body);
+
+        // Return the updated user
         res.status(200).json(user);
     } catch (error) {
         res.status(500).json({ error: 'Internal Server Error' });
     }
 });
+
 
 /**
  * @swagger

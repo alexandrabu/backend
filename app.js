@@ -6,6 +6,9 @@ const swaggerUi = require('swagger-ui-express');
 const swaggerSpec = require('./swagger');
 const session = require('express-session');
 const { keycloak, memoryStore } = require('./config/keycloak');
+
+
+
 const { connectDB } = require('./config/db');
 
 // Import Routes
@@ -34,20 +37,27 @@ app.use(session({
 app.use(keycloak.middleware());
 
 // CORS & JSON Middleware
-app.use(cors());
+app.use(cors({
+    origin: 'http://localhost:4200',
+    methods: 'GET,POST,PUT,DELETE',
+    allowedHeaders: 'Content-Type,Authorization'
+}));
 app.use(bodyParser.json());
 
-// Swagger API Documentation
-app.use('/api-docs', swaggerUi.serve, swaggerUi.setup(swaggerSpec));
+/*
+app.use('/api-docs', swaggerUi.serve, swaggerUi.setup(swaggerSpec)); */
+// Protected Swagger API Documentation Route
+app.use('/api-docs', keycloak.protect('realm:admin'), swaggerUi.serve, swaggerUi.setup(swaggerSpec));
+
 
 // Public Route (Accessible by anyone)
 app.get('/api/public', (req, res) => {
-    res.json({ message: 'This is a public route.' });
+    res.json({ message: 'This is a public route' });
 });
 
 // Protected Routes (Require Authentication)
 app.get('/api/protected', keycloak.protect(), (req, res) => {
-    res.json({ message: 'This is a protected route' });
+    res.json({ message: 'The credentials are valid !' });
 });
 
 // Admin-Only Route
