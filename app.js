@@ -5,14 +5,22 @@ const bodyParser = require('body-parser');
 const swaggerUi = require('swagger-ui-express');
 const swaggerSpec = require('./swagger');
 const session = require('express-session');
-const { keycloak, memoryStore } = require('./config/keycloak');
-
-const { connectDB } = require('./config/db');
+const {
+  keycloak,
+  memoryStore
+} = require('./config/keycloak');
+const {
+  connectDB
+} = require('./config/db');
 
 // Import Routes
 const userRoutes = require('./routes/userRoutes');
 const departmentRoutes = require('./routes/departmentRoutes');
 const managerRoutes = require('./routes/managerRoutes');
+const itemsRoute = require('./routes/items');
+import React from 'react';
+import { ToastContainer } from 'react-toastify';
+import 'react-toastify/dist/ReactToastify.css';
 
 const app = express();
 
@@ -23,7 +31,7 @@ app.use((req, res, next) => {
   next();
 });
 
-// Session Middleware (Required for Keycloak)
+// Session Middleware 
 app.use(
   session({
     secret: process.env.SESSION_SECRET || 'test_secret', // Fallback for tests
@@ -39,16 +47,14 @@ app.use(keycloak.middleware());
 // CORS & JSON Middleware
 app.use(
   cors({
-    origin: 'http://localhost:4200',
+    origin: 'http://localhost:3000',
     methods: 'GET,POST,PUT,DELETE',
     allowedHeaders: 'Content-Type,Authorization',
   }),
 );
+
 app.use(bodyParser.json());
 
-/*
-app.use('/api-docs', swaggerUi.serve, swaggerUi.setup(swaggerSpec)); */
-// Protected Swagger API Documentation Route
 app.use(
   '/api-docs',
   keycloak.protect('realm:admin'),
@@ -56,20 +62,29 @@ app.use(
   swaggerUi.setup(swaggerSpec),
 );
 
-// Public Route (Accessible by anyone)
+// Public Route 
 app.get('/api/public', (req, res) => {
-  res.json({ message: 'This is a public route' });
+  res.json({
+    message: 'This is a public route'
+  });
 });
 
-// Protected Routes (Require Authentication)
+// Protected Routes 
 app.get('/api/protected', keycloak.protect(), (req, res) => {
-  res.json({ message: 'The credentials are valid !' });
+  res.json({
+    message: 'The credentials are valid !'
+  });
 });
 
 // Admin-Only Route
 app.get('/api/admin', keycloak.protect('realm:admin'), (req, res) => {
-  res.json({ message: 'Admin-only route' });
+  res.json({
+    message: 'Admin-only route'
+  });
 });
+
+app.use('/api/items', itemsRoute);
+
 
 // Apply API Routes (No Global Keycloak Protection)
 app.use('/api/users', userRoutes);
@@ -82,12 +97,16 @@ connectDB();
 // Handle API Errors
 app.use((err, req, res, next) => {
   console.error('Server Error:', err);
-  res.status(500).json({ error: 'Internal Server Error' });
+  res.status(500).json({
+    error: 'Internal Server Error'
+  });
 });
 
 // Handle 404 Errors (Route Not Found)
 app.use((req, res) => {
-  res.status(404).json({ error: 'Route not found' });
+  res.status(404).json({
+    error: 'Route not found'
+  });
 });
 
 // Export the app for testing
