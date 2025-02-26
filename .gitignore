@@ -1,11 +1,13 @@
-
 node_modules/
-.env
-.env.*
-config/*.json
-config/*.local.js
-*.db
-logs/
-frontend/
-coverage/
 
+*.log
+.env
+dist/
+build/
+.DS_Store
+Thumbs.db
+coverage/
+.eslintcache
+npm-debug.log*
+/build/
+.build/

@@ -14,13 +14,13 @@ const router = express.Router();
  *         description: A list of departments
  */
 router.get('/', async (req, res) => {
-    try {
-        const departments = await Department.findAll();
-        res.status(200).json(departments);
-    } catch (error) {
-        console.error("Error fetching departments:", error);
-        res.status(500).json({ error: 'Internal Server Error' });
-    }
+  try {
+    const departments = await Department.findAll();
+    res.status(200).json(departments);
+  } catch (error) {
+    console.error('Error fetching departments:', error);
+    res.status(500).json({ error: 'Internal Server Error' });
+  }
 });
 
 /**
@@ -41,14 +41,14 @@ router.get('/', async (req, res) => {
  *         description: Department not found
  */
 router.get('/:id', async (req, res) => {
-    try {
-        const department = await Department.findByPk(req.params.id);
-        if (!department) return res.status(404).json({ error: 'Department not found' });
-        res.status(200).json(department);
-    } catch (error) {
-        console.error("Error fetching department:", error);
-        res.status(500).json({ error: 'Internal Server Error' });
-    }
+  try {
+    const department = await Department.findByPk(req.params.id);
+    if (!department) return res.status(404).json({ error: 'Department not found' });
+    res.status(200).json(department);
+  } catch (error) {
+    console.error('Error fetching department:', error);
+    res.status(500).json({ error: 'Internal Server Error' });
+  }
 });
 
 /**
@@ -72,22 +72,21 @@ router.get('/:id', async (req, res) => {
  *         description: Department created successfully
  */
 router.post('/', async (req, res) => {
-    const { name, manager_id } = req.body;
+  const { name, manager_id } = req.body;
 
-    // Check for required fields
-    if (!name || !manager_id) {
-        return res.status(400).json({ error: 'Missing required fields' });
-    }
+  // Check for required fields
+  if (!name || !manager_id) {
+    return res.status(400).json({ error: 'Missing required fields' });
+  }
 
-    try {
-        const department = await Department.create(req.body);
-        res.status(201).json(department);
-    } catch (error) {
-        console.error("Error creating department:", error);
-        res.status(500).json({ error: 'Internal Server Error' });
-    }
+  try {
+    const department = await Department.create(req.body);
+    res.status(201).json(department);
+  } catch (error) {
+    console.error('Error creating department:', error);
+    res.status(500).json({ error: 'Internal Server Error' });
+  }
 });
-
 
 /**
  * @swagger
@@ -115,25 +114,22 @@ router.post('/', async (req, res) => {
  *       404:
  *         description: Department not found
  */
-router.put(
-    '/:id',
-    async (req, res) => {
-        try {
-            const department = await Department.findByPk(req.params.id);
-            if (!department) {
-                return res.status(404).json({ error: 'Department not found' });
-            }
-
-            await department.update(req.body);
-
-            // Return the updated department
-            res.status(200).json(department);
-        } catch (error) {
-            console.error("Error updating department:", error);
-            res.status(500).json({ error: 'Internal Server Error' });
-        }
+router.put('/:id', async (req, res) => {
+  try {
+    const department = await Department.findByPk(req.params.id);
+    if (!department) {
+      return res.status(404).json({ error: 'Department not found' });
     }
-);
+
+    await department.update(req.body);
+
+    // Return the updated department
+    res.status(200).json(department);
+  } catch (error) {
+    console.error('Error updating department:', error);
+    res.status(500).json({ error: 'Internal Server Error' });
+  }
+});
 
 /**
  * @swagger
@@ -153,16 +149,16 @@ router.put(
  *         description: Department not found
  */
 router.delete('/:id', async (req, res) => {
-    try {
-        const department = await Department.findByPk(req.params.id);
-        if (!department) return res.status(404).json({ error: 'Department not found' });
+  try {
+    const department = await Department.findByPk(req.params.id);
+    if (!department) return res.status(404).json({ error: 'Department not found' });
 
-        await department.destroy();
-        res.status(204).send();
-    } catch (error) {
-        console.error("Error deleting department:", error);
-        res.status(500).json({ error: 'Internal Server Error' });
-    }
+    await department.destroy();
+    res.status(204).send();
+  } catch (error) {
+    console.error('Error deleting department:', error);
+    res.status(500).json({ error: 'Internal Server Error' });
+  }
 });
 
 module.exports = router;

@@ -1,5 +1,3 @@
-
-
 const express = require('express');
 const { body, param, validationResult } = require('express-validator');
 const { User, Department } = require('../models');
@@ -16,12 +14,12 @@ const router = express.Router();
  *         description: A list of users
  */
 router.get('/', async (req, res) => {
-    try {
-        const users = await User.findAll();
-        res.status(200).json(users);
-    } catch (error) {
-        res.status(500).json({ error: 'Internal Server Error' });
-    }
+  try {
+    const users = await User.findAll();
+    res.status(200).json(users);
+  } catch (error) {
+    res.status(500).json({ error: 'Internal Server Error' });
+  }
 });
 
 /**
@@ -42,13 +40,13 @@ router.get('/', async (req, res) => {
  *         description: User not found
  */
 router.get('/:id', async (req, res) => {
-    try {
-        const user = await User.findByPk(req.params.id);
-        if (!user) return res.status(404).json({ error: 'User not found' });
-        res.status(200).json(user);
-    } catch (error) {
-        res.status(500).json({ error: 'Internal Server Error' });
-    }
+  try {
+    const user = await User.findByPk(req.params.id);
+    if (!user) return res.status(404).json({ error: 'User not found' });
+    res.status(200).json(user);
+  } catch (error) {
+    res.status(500).json({ error: 'Internal Server Error' });
+  }
 });
 
 /**
@@ -78,39 +76,36 @@ router.get('/:id', async (req, res) => {
  *         description: User created successfully
  */
 router.post('/', async (req, res) => {
-    const { name, email, department_id } = req.body;
+  const { name, email, department_id } = req.body;
 
-    // Check for required fields
-    if (!name || !email || !department_id) {
-        return res.status(400).json({ error: 'Missing required fields' });
+  // Check for required fields
+  if (!name || !email || !department_id) {
+    return res.status(400).json({ error: 'Missing required fields' });
+  }
+
+  try {
+    // Check if Department exists
+    const department = await Department.findByPk(department_id);
+    if (!department) {
+      return res.status(400).json({ error: 'Invalid department_id' });
     }
 
-    try {
-        // Check if Department exists
-        const department = await Department.findByPk(department_id);
-        if (!department) {
-            return res.status(400).json({ error: 'Invalid department_id' });
-        }
-
-        // Check if Email is unique
-        const existingUser = await User.findOne({ where: { email } });
-        if (existingUser) {
-            return res.status(400).json({ error: 'Email already exists' });
-        }
-
-        // Create the user
-        const user = await User.create({ name, email, department_id });
-
-        // SUCCESS RESPONSE
-        return res.status(201).json({ message: 'User created successfully', user });
-
-    } catch (error) {
-        console.error('Error creating user:', error);  // Log exact error
-        return res.status(500).json({ error: 'Internal Server Error', details: error.message });
+    // Check if Email is unique
+    const existingUser = await User.findOne({ where: { email } });
+    if (existingUser) {
+      return res.status(400).json({ error: 'Email already exists' });
     }
+
+    // Create the user
+    const user = await User.create({ name, email, department_id });
+
+    // SUCCESS RESPONSE
+    return res.status(201).json({ message: 'User created successfully', user });
+  } catch (error) {
+    console.error('Error creating user:', error); // Log exact error
+    return res.status(500).json({ error: 'Internal Server Error', details: error.message });
+  }
 });
-
-
 
 /**
  * @swagger
@@ -143,21 +138,20 @@ router.post('/', async (req, res) => {
  *         description: User not found
  */
 router.put('/:id', async (req, res) => {
-    try {
-        const user = await User.findByPk(req.params.id);
-        if (!user) {
-            return res.status(404).json({ error: 'User not found' });
-        }
-
-        await user.update(req.body);
-
-        // Return the updated user
-        res.status(200).json(user);
-    } catch (error) {
-        res.status(500).json({ error: 'Internal Server Error' });
+  try {
+    const user = await User.findByPk(req.params.id);
+    if (!user) {
+      return res.status(404).json({ error: 'User not found' });
     }
-});
 
+    await user.update(req.body);
+
+    // Return the updated user
+    res.status(200).json(user);
+  } catch (error) {
+    res.status(500).json({ error: 'Internal Server Error' });
+  }
+});
 
 /**
  * @swagger
@@ -177,14 +171,14 @@ router.put('/:id', async (req, res) => {
  *         description: User not found
  */
 router.delete('/:id', async (req, res) => {
-    try {
-        const user = await User.findByPk(req.params.id);
-        if (!user) return res.status(404).json({ error: 'User not found' });
-        await user.destroy();
-        res.status(204).send();
-    } catch (error) {
-        res.status(500).json({ error: 'Internal Server Error' });
-    }
+  try {
+    const user = await User.findByPk(req.params.id);
+    if (!user) return res.status(404).json({ error: 'User not found' });
+    await user.destroy();
+    res.status(204).send();
+  } catch (error) {
+    res.status(500).json({ error: 'Internal Server Error' });
+  }
 });
 
 module.exports = router;
