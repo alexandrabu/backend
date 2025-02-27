@@ -6,14 +6,15 @@ import api from './api';
 // Read
 export const getAllItems = async () => {
     try {
-        // Temporarily force an error to check if toast is working
-        throw new Error('Forced Error for Testing');
+        const response = await api.get('/items');
+        return response.data;
     } catch (error) {
         console.error('Failed to fetch items:', error.message);
         toast.error('Failed to fetch items. Please try again.');
         throw error;
     }
-};
+}; 
+
 
 
 // Create 

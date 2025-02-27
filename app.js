@@ -18,9 +18,7 @@ const userRoutes = require('./routes/userRoutes');
 const departmentRoutes = require('./routes/departmentRoutes');
 const managerRoutes = require('./routes/managerRoutes');
 const itemsRoute = require('./routes/items');
-import React from 'react';
-import { ToastContainer } from 'react-toastify';
-import 'react-toastify/dist/ReactToastify.css';
+
 
 const app = express();
 
@@ -86,10 +84,9 @@ app.get('/api/admin', keycloak.protect('realm:admin'), (req, res) => {
 app.use('/api/items', itemsRoute);
 
 
-// Apply API Routes (No Global Keycloak Protection)
-app.use('/api/users', userRoutes);
-app.use('/api/departments', departmentRoutes);
-app.use('/api/managers', managerRoutes);
+app.use('/api/users', keycloak.protect(), userRoutes);
+app.use('/api/departments', keycloak.protect(), departmentRoutes);
+app.use('/api/managers', keycloak.protect(), managerRoutes);
 
 // Connect to Database
 connectDB();
