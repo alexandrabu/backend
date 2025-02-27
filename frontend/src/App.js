@@ -1,67 +1,80 @@
 import React from 'react';
-import { ReactKeycloakProvider } from '@react-keycloak/web';
-import { BrowserRouter as Router, Route, Routes } from 'react-router-dom';
-import keycloak from './keycloak';
+import { BrowserRouter as Router, Route, Routes, Link } from 'react-router-dom';
+import { useKeycloak } from '@react-keycloak/web';
+import UserList from './components/UserList';
+import DepartmentList from './components/DepartmentList';
+import ManagerList from './components/ManagerList';
 import Home from './components/Home';
-import AdminPage from './components/AdminPage';
-import HelloWorld from './components/HelloWorld';
-import ItemList from './components/ItemList';
-import { ToastContainer } from 'react-toastify';
-import 'react-toastify/dist/ReactToastify.css';
+import AdminDashboard from './components/AdminDashboard';
 
-const App = () => {
-  return (
-    <ReactKeycloakProvider
-      authClient={keycloak}
-      initOptions={{ onLoad: 'login-required' }}
-      onEvent={(event, error) => {
-        if (event === 'onAuthSuccess') {
-          console.log('User authenticated');
-        }
-        if (event === 'onAuthError') {
-          console.error('Authentication Error:', error);
-        }
-      }}
-    >
-      <ToastContainer />
-      <Router>
-        <Routes>
-          <Route path="/" element={<Home />} />
-          <Route path="/admin" element={<AdminPage />} />
-          <Route
-            path="/hello-world"
-            element={
-              <div className="App">
-                <HelloWorld />
-                <ItemList />
-              </div>
-            }
-          />
-        </Routes>
-      </Router>
-    </ReactKeycloakProvider>
-  );
+const PrivateRoute = ({ children }) => {
+  const keycloakContext = useKeycloak();
+
+  if (!keycloakContext) {
+    return <div>Loading...</div>;
+  }
+
+  const { keycloak } = keycloakContext;
+
+  if (!keycloak.authenticated) {
+    keycloak.login();
+    return <div>Redirecting...</div>;
+  }
+
+  return children;
 };
 
-export default App;
+function App() {
+  const { keycloak } = useKeycloak();
 
-/*
-import React from 'react';
-import HelloWorld from './components/HelloWorld';
-import ItemList from './components/ItemList';
-import { ToastContainer } from 'react-toastify';
-import 'react-toastify/dist/ReactToastify.css';
-
-const App = () => {
   return (
-    <>
-      <ToastContainer />
-      <div className="App">
-        <HelloWorld />
-        <ItemList />
-      </div>
-    </>
+    <Router>
+      <nav>
+        <ul>
+          <li><Link to="/">Home</Link></li>
+          <li><Link to="/users">Users</Link></li>
+          <li><Link to="/departments">Departments</Link></li>
+          <li><Link to="/managers">Managers</Link></li>
+        </ul>
+      </nav>
+
+      {keycloak && keycloak.authenticated && (
+        <h2>Welcome, {keycloak.tokenParsed?.preferred_username}</h2>
+      )}
+
+      {keycloak && keycloak.tokenParsed && keycloak.tokenParsed.realm_access.roles.includes('admin') && (
+        <button style={{ marginTop: '20px' }}>
+          <a href="http://localhost:5000/api-docs" target="_blank" rel="noopener noreferrer">
+            Admin Dashboard
+          </a>
+        </button>
+      )}
+
+      <Routes>
+        <Route path="/" element={<Home />} />
+        <Route path="/users" element={
+          <PrivateRoute>
+            <UserList />
+          </PrivateRoute>
+        } />
+        <Route path="/departments" element={
+          <PrivateRoute>
+            <DepartmentList />
+          </PrivateRoute>
+        } />
+        <Route path="/managers" element={
+          <PrivateRoute>
+            <ManagerList />
+          </PrivateRoute>
+        } />
+        <Route path="/admin" element={
+          <PrivateRoute>
+            <AdminDashboard />
+          </PrivateRoute>
+        } />
+      </Routes>
+    </Router>
   );
 }
 
-export default App; */
+export default App;

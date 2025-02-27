@@ -6,10 +6,13 @@ const Home = () => {
 
     return (
         <div>
-            <h1>Welcome, {keycloak.tokenParsed?.preferred_username}</h1>
-            {keycloak.hasRealmRole('admin') && (
-                <button>Admin Dashboard</button>
+
+            {keycloak && keycloak.tokenParsed && keycloak.tokenParsed.realm_access.roles.includes('admin') && (
+                <p style={{ color: 'green', marginTop: '10px' }}>
+                    As an admin, you have access to the API documentation. Click the button below to check Swagger.
+                </p>
             )}
+
         </div>
     );
 };

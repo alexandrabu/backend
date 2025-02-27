@@ -11,6 +11,7 @@
     "axios": "^1.7.9",
     "cors": "^2.8.5",
     "keycloak-js": "^26.2.0",
+    "ngx-toastr": "^19.0.0",
     "react": "^19.0.0",
     "react-dom": "^19.0.0",
     "react-router-dom": "^6.29.0",

@@ -3,10 +3,6 @@ const cors = require('cors');
 const itemsRoute = require('./routes/items');
 const allowedOrigins = ['http://localhost:3000'];
 
-app.use(cors({
-  origin: allowedOrigins,
-  credentials: true
-}));
 
 // Registering the items route
 app.use('/api/items', itemsRoute);
