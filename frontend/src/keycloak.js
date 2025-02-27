@@ -6,6 +6,7 @@ const keycloak = new Keycloak({
     clientId: process.env.REACT_APP_KEYCLOAK_CLIENT_ID
 });
 
+/*
 keycloak.onTokenExpired = () => {
     keycloak.updateToken(30).then((refreshed) => {
         if (refreshed) {
@@ -16,6 +17,6 @@ keycloak.onTokenExpired = () => {
     }).catch(() => {
         console.error(' Failed to refresh token');
     });
-};
+}; */
 
 export default keycloak;
