@@ -1,19 +1,12 @@
-// src/components/ManagerList.js
-import React, { useEffect, useState } from 'react';
-import ApiService from '../services/api.service';
+import React from 'react';
+import { useApiData } from '../services/api.service';
 
 const ManagerList = () => {
-    const [managers, setManagers] = useState([]);
+    const { data: managers = [], error, isLoading } = useApiData({ endpoint: 'managers' });
 
-    useEffect(() => {
-        ApiService.get('managers')
-            .then((response) => {
-                setManagers(response.data);
-            })
-            .catch((error) => {
-                console.error('Error fetching managers:', error);
-            });
-    }, []);
+
+    if (isLoading) return <div>Loading...</div>;
+    if (error) return <div>Error fetching managers: {error.message}</div>;
 
     return (
         <div>

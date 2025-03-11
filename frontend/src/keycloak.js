@@ -7,15 +7,16 @@ const keycloak = new Keycloak({
 });
 
 
+
 keycloak.onTokenExpired = () => {
     keycloak.updateToken(30).then((refreshed) => {
         if (refreshed) {
-            console.log(' Token refreshed');
+            console.log('Token refreshed');
         } else {
             console.warn('Token not refreshed, user is still logged in');
         }
     }).catch(() => {
-        console.error(' Failed to refresh token');
+        console.error('Failed to refresh token');
     });
 };
 
