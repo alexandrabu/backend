@@ -16,7 +16,7 @@ function App() {
   const [data, setData] = useState([]);
 
   useEffect(() => {
-    fetch("http://localhost:5000/api/combined-data") //  Hardcoded API URL
+    fetch("http://localhost:5000/api/combined-data")
       .then((response) => response.json())
       .then((departments) => {
         if (!Array.isArray(departments)) {

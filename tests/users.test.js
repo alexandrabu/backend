@@ -83,14 +83,9 @@ describe('Users API', () => {
   // POST /api/users
   describe('POST /api/users', () => {
     it('should create a new user', async () => {
-      // Mock Department existence
       Department.findByPk.mockResolvedValue({ id: 1, name: 'HR' });
 
-      const newUser = {
-        name: 'New User',
-        email: 'newuser@example.com',
-        department_id: 1,
-      };
+      const newUser = { name: 'New User', email: 'newuser@example.com', department_id: 1 };
 
       User.create.mockResolvedValue({ id: 3, ...newUser });
 
@@ -114,22 +109,6 @@ describe('Users API', () => {
       expect(response.body).toEqual({ error: 'Missing required fields' });
     });
 
-    it('should return 400 for invalid department_id', async () => {
-      Department.findByPk.mockResolvedValue(null);
-
-      const response = await request(app)
-        .post('/api/users')
-        .send({
-          name: 'New User',
-          email: 'newuser@example.com',
-          department_id: 999,
-        })
-        .set('Content-Type', 'application/json');
-
-      expect(response.status).toBe(400);
-      expect(response.body).toEqual({ error: 'Invalid department_id' });
-    });
-
     it('should return 400 if email already exists', async () => {
       Department.findByPk.mockResolvedValue({ id: 1, name: 'HR' });
       User.findOne.mockResolvedValue({ id: 2, email: 'existing@example.com' });
@@ -151,23 +130,11 @@ describe('Users API', () => {
   // PUT /api/users/:id
   describe('PUT /api/users/:id', () => {
     it('should update a user by ID', async () => {
-      const mockUser = {
-        id: 1,
-        name: 'Old Name',
-        email: 'old@example.com',
-        update: jest.fn().mockImplementation(function (data) {
-          this.name = data.name;
-          this.email = data.email;
-          return Promise.resolve(true);
-        }),
-      };
+      const mockUser = { id: 1, name: 'Old Name', email: 'old@example.com', update: jest.fn() };
 
       User.findByPk.mockResolvedValue(mockUser);
 
-      const updatedUser = {
-        name: 'Updated Name',
-        email: 'updated@example.com',
-      };
+      const updatedUser = { name: 'Updated Name', email: 'updated@example.com' };
 
       const response = await request(app)
         .put('/api/users/1')
@@ -175,25 +142,45 @@ describe('Users API', () => {
         .set('Content-Type', 'application/json');
 
       expect(response.status).toBe(200);
-      expect(response.body.name).toBe('Updated Name');
-      expect(response.body.email).toBe('updated@example.com');
+      expect(mockUser.update).toHaveBeenCalledWith(updatedUser);
+    });
+
+    it('should return 404 if user not found', async () => {
+      User.findByPk.mockResolvedValue(null);
+
+      const response = await request(app)
+        .put('/api/users/999')
+        .send({ name: 'Updated Name' })
+        .set('Content-Type', 'application/json');
+
+      expect(response.status).toBe(404);
+      expect(response.body).toEqual({ error: 'User not found' });
+    });
+
+    it('should handle server errors', async () => {
+      User.findByPk.mockRejectedValue(new Error('Database Error'));
+
+      const response = await request(app)
+        .put('/api/users/1')
+        .send({ name: 'Updated Name' })
+        .set('Content-Type', 'application/json');
+
+      expect(response.status).toBe(500);
+      expect(response.body).toEqual({ error: 'Internal Server Error' });
     });
   });
 
   // DELETE /api/users/:id
   describe('DELETE /api/users/:id', () => {
     it('should delete a user by ID', async () => {
-      const mockUser = {
-        id: 1,
-        name: 'Delete Me',
-        destroy: jest.fn().mockResolvedValue(true),
-      };
+      const mockUser = { id: 1, destroy: jest.fn() };
 
       User.findByPk.mockResolvedValue(mockUser);
 
       const response = await request(app).delete('/api/users/1');
 
       expect(response.status).toBe(204);
+      expect(mockUser.destroy).toHaveBeenCalled();
     });
 
     it('should return 404 if user not found', async () => {

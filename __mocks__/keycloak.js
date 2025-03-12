@@ -1,7 +1,10 @@
 module.exports = {
   keycloak: {
-    protect: () => (req, res, next) => next(),
-    middleware: () => (req, res, next) => next(), // Correctly mocked as a middleware function
+    protect: () => (req, res, next) => {
+      console.log('Keycloak mock is being used'); // Debugging
+      next();
+    },
+    middleware: () => (req, res, next) => next(),
   },
   memoryStore: {},
 };
