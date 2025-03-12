@@ -1,37 +1,26 @@
-
-/*import React from 'react';
-import { useApiData } from '../services/api.service';
-
-const DepartmentList = () => {
-
-    const { data: departments, error, isLoading } = useApiData({ endpoint: 'departments' });
-
-    if (isLoading) return <div>Loading...</div>;
-    if (error) return <div>Error fetching departments: {error.message}</div>;
-
-    return (
-        <div>
-            <h2>Department List</h2>
-            <ul>
-                {departments.map((dept) => (
-                    <li key={dept.id}>{dept.name}</li>
-                ))}
-            </ul>
-        </div>
-    );
-};
-
-export default DepartmentList;
-*/
-
-import React from "react";
+import React, { useEffect, useState } from "react";
 import { useApiData } from "../services/api.service";
 
 const DepartmentList = () => {
-    const { data: departments, error, isLoading } = useApiData({ endpoint: "departments" });
+    const { data: departments, error: deptError, isLoading: deptLoading } = useApiData({ endpoint: "departments" });
+    const { data: users, error: userError, isLoading: userLoading } = useApiData({ endpoint: "users" });
 
-    if (isLoading) return <div>Loading...</div>;
-    if (error) return <div>Error fetching departments: {error.message}</div>;
+    const [managerMap, setManagerMap] = useState({});
+
+    useEffect(() => {
+        if (users) {
+            // Create a mapping of user ID to user name
+            const map = {};
+            users.forEach(user => {
+                map[user.id] = user.name;
+            });
+            setManagerMap(map);
+        }
+    }, [users]);
+
+    if (deptLoading || userLoading) return <div>Loading...</div>;
+    if (deptError) return <div>Error fetching departments: {deptError.message}</div>;
+    if (userError) return <div>Error fetching users: {userError.message}</div>;
 
     return (
         <div>
@@ -49,7 +38,7 @@ const DepartmentList = () => {
                         <tr key={dept.id}>
                             <td>{dept.name}</td>
                             <td>{dept.manager_id || "N/A"}</td>
-                            <td>{dept.manager ? dept.manager.name : "N/A"}</td>
+                            <td>{managerMap[dept.manager_id] || "N/A"}</td>
                         </tr>
                     ))}
                 </tbody>

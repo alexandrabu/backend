@@ -17,40 +17,35 @@ const itemsRoute = require('./routes/items');
 
 const app = express();
 
-// Logging Middleware
-app.use((req, res, next) => {
-  console.log(`Incoming Request: ${req.method} ${req.url}`);
-  console.log('Headers:', req.headers);
-  next();
-});
+// **CORS Configuration**
+const corsOptions = {
+  origin: process.env.CORS_ORIGIN.split(','), // Allow multiple origins from env
+  methods: ['GET', 'POST', 'PUT', 'DELETE'],
+  allowedHeaders: ['Content-Type', 'Authorization'],
+  credentials: true, // Allow cookies/session credentials
+};
 
-// Session Middleware 
+app.use(cors(corsOptions));
+
+// **Session Middleware**
 app.use(
   session({
     secret: process.env.SESSION_SECRET || 'test_secret',
     resave: false,
     saveUninitialized: true,
     store: memoryStore,
-  }),
-);
-
-// Keycloak Middleware
-app.use(keycloak.middleware());
-
-app.use(express.json());
-app.use(express.urlencoded({ extended: true }));
-app.use(
-  cors({
-    origin: 'http://localhost:3000',
-    methods: 'GET,POST,PUT,DELETE',
-    allowedHeaders: 'Content-Type,Authorization',
-    credentials: true,
   })
 );
 
+// **Keycloak Middleware**
+app.use(keycloak.middleware());
+
+// **Body Parsing Middleware**
+app.use(express.json());
+app.use(express.urlencoded({ extended: true }));
 app.use(bodyParser.json());
 
-// Swagger API Documentation
+// **Swagger API Documentation**
 app.use(
   '/api-docs',
   keycloak.protect('realm:admin'),
@@ -58,38 +53,38 @@ app.use(
   swaggerUi.setup(swaggerSpec),
 );
 
-// Public Route (No authentication required)
+// **Public Routes (No authentication required)**
 app.get('/api/public', (req, res) => {
   res.json({ message: 'This is a public route' });
 });
 
-// Protected Routes (Requires valid authentication)
+// **Protected Routes**
 app.get('/api/protected', keycloak.protect(), (req, res) => {
   res.json({ message: 'The credentials are valid!' });
 });
 
-// Admin-Only Route
+// **Admin-Only Route**
 app.get('/api/admin', keycloak.protect('realm:admin'), (req, res) => {
   res.json({ message: 'Admin-only route' });
 });
 
-// Register API Routes
+// **Register API Routes**
 app.use('/api/items', itemsRoute);
 app.use('/api/users', keycloak.protect(), userRoutes);
 app.use('/api/departments', keycloak.protect(), departmentRoutes);
 app.use('/api/managers', keycloak.protect(), managerRoutes);
 app.use('/api/combined-data', combinedRoutes);
 
-// Connect to Database
+// **Connect to Database**
 connectDB();
 
-// Handle API Errors
+// **Handle API Errors**
 app.use((err, req, res, next) => {
   console.error('Server Error:', err);
   res.status(500).json({ error: 'Internal Server Error' });
 });
 
-// Handle 404 Errors (Route Not Found)
+// **Handle 404 Errors**
 app.use((req, res) => {
   res.status(404).json({ error: 'Route not found' });
 });

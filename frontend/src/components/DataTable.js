@@ -9,11 +9,13 @@ const DataTable = ({ data, columns, pageSizeOptions = [5, 10, 20] }) => {
     const [currentPage, setCurrentPage] = useState(1);
     const [pageSize, setPageSize] = useState(pageSizeOptions[0]);
 
-    // Filter data based on search input
+    // Filter data based on search input (by name or ID)
     const filteredData = useMemo(() => {
-        return data.filter((row) =>
-            row.name.toLowerCase().includes(searchTerm.toLowerCase())
-        );
+        return data.filter((row) => {
+            const matchesName = row.name.toLowerCase().includes(searchTerm.toLowerCase());
+            const matchesID = row.id.toString().includes(searchTerm);
+            return matchesName || matchesID;
+        });
     }, [data, searchTerm]);
 
     // Sort Data
@@ -45,7 +47,7 @@ const DataTable = ({ data, columns, pageSizeOptions = [5, 10, 20] }) => {
             <input
                 type="text"
                 className="form-control mb-3"
-                placeholder="Search by name..."
+                placeholder="Search by ID or Name..."
                 value={searchTerm}
                 onChange={(e) => setSearchTerm(e.target.value)}
             />
@@ -54,6 +56,11 @@ const DataTable = ({ data, columns, pageSizeOptions = [5, 10, 20] }) => {
             <table className="table table-striped table-bordered">
                 <thead>
                     <tr>
+                        {/* Add ID column */}
+                        <th onClick={() => handleSort("id")} style={{ cursor: "pointer" }}>
+                            ID {sortColumn === "id" ? (sortOrder === "asc" ? "↑" : "↓") : ""}
+                        </th>
+
                         {columns.map((col) => (
                             <th key={col.key} onClick={() => handleSort(col.key)} style={{ cursor: "pointer" }}>
                                 {col.label} {sortColumn === col.key ? (sortOrder === "asc" ? "↑" : "↓") : ""}
@@ -64,6 +71,9 @@ const DataTable = ({ data, columns, pageSizeOptions = [5, 10, 20] }) => {
                 <tbody>
                     {paginatedData.map((row, index) => (
                         <tr key={index}>
+                            {/* Display ID column */}
+                            <td>{row.id}</td>
+
                             {columns.map((col) => (
                                 <td key={col.key}>
                                     {row[col.key] !== undefined ? row[col.key] : "N/A"}

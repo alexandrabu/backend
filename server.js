@@ -1,11 +1,5 @@
-const app = require('./app');
-const cors = require('cors');
-const itemsRoute = require('./routes/items');
-const allowedOrigins = ['http://localhost:3000'];
-
-
-// Registering the items route
-app.use('/api/items', itemsRoute);
+const app = require('./app'); // Import the app instance
+require('dotenv').config(); // Load environment variables
 
 // Start the server only if not in test mode
 if (process.env.NODE_ENV !== 'test') {
