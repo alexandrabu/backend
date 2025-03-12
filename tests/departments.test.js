@@ -11,7 +11,7 @@ beforeAll(async () => {
   await sequelize.sync({ force: true });
 
   // Silence console.error during tests
-  jest.spyOn(console, 'error').mockImplementation(() => {});
+  jest.spyOn(console, 'error').mockImplementation(() => { });
 });
 
 afterAll(async () => {
