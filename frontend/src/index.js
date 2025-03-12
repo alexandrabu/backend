@@ -6,14 +6,12 @@ import keycloak from './keycloak';
 import { StateProvider } from './context/StateProvider';
 import QueryProvider from './context/QueryProvider';
 import 'bootstrap/dist/css/bootstrap.min.css';
-
+import 'bootstrap/dist/js/bootstrap.bundle.min.js';
 
 const keycloakInitConfig = {
-  onLoad: 'check-sso',
+  onLoad: 'login-required', // Forces login before showing the app
   checkLoginIframe: false,
   pkceMethod: 'S256',
-  enableLogging: true,
-  persistLogin: true,
 };
 
 const root = ReactDOM.createRoot(document.getElementById('root'));
