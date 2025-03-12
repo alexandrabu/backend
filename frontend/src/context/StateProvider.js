@@ -24,8 +24,15 @@ export const StateProvider = ({ children }) => {
         }
     }, [initialized, keycloak]);
 
+    //  Logout Function
+    const logout = () => {
+        if (keycloak) {
+            keycloak.logout({ redirectUri: window.location.origin }); // Redirect after logout
+        }
+    };
+
     return (
-        <AuthContext.Provider value={{ keycloak, isAuthenticated, user, roles }}>
+        <AuthContext.Provider value={{ keycloak, isAuthenticated, user, roles, logout }}>
             {initialized ? children : <p>Loading...</p>}
         </AuthContext.Provider>
     );
